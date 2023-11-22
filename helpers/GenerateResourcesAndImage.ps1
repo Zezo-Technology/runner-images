@@ -17,20 +17,21 @@ Function Get-PackerTemplatePath {
     )
 
     switch ($ImageType) {
+        # Note: Double Join-Path is required to support PowerShell 5.1
         ([ImageType]::Windows2019) {
-            $relativeTemplatePath = Join-Path "win" "windows2019.json"
+            $relativeTemplatePath = Join-Path (Join-Path "windows" "templates") "windows-2019.json"
         }
         ([ImageType]::Windows2022) {
-            $relativeTemplatePath = Join-Path "win" "windows2022.json"
+            $relativeTemplatePath = Join-Path (Join-Path "windows" "templates") "windows-2022.json"
         }
         ([ImageType]::Ubuntu2004) {
-            $relativeTemplatePath = Join-Path "linux" "ubuntu2004.json"
+            $relativeTemplatePath = Join-Path (Join-Path "ubuntu" "templates") "ubuntu-20.04.json"
         }
         ([ImageType]::Ubuntu2204) {
-            $relativeTemplatePath = Join-Path "linux" "ubuntu2204.pkr.hcl"
+            $relativeTemplatePath = Join-Path (Join-Path "ubuntu" "templates") "ubuntu-22.04.pkr.hcl"
         }
         ([ImageType]::UbuntuMinimal) {
-            $relativeTemplatePath = Join-Path "linux" "ubuntuminimal.pkr.hcl"
+            $relativeTemplatePath = Join-Path (Join-Path "ubuntu" "templates") "ubuntu-minimal.pkr.hcl"
         }
         default { throw "Unknown type of image" }
     }
@@ -174,6 +175,10 @@ Function GenerateResourcesAndImage {
                 Write-Verbose "PowerShell 5 detected. Replacing double quotes with escaped double quotes in allowed inbound IP addresses."
                 $AllowedInboundIpAddresses = '[\"{0}\"]' -f $AgentIp
             }
+            elseif ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -le 2) {
+                Write-Verbose "PowerShell 7.0-7.2 detected. Replacing double quotes with escaped double quotes in allowed inbound IP addresses."
+                $AllowedInboundIpAddresses = '[\"{0}\"]' -f $AgentIp
+            }
             else {
                 $AllowedInboundIpAddresses = '["{0}"]' -f $AgentIp
             }
@@ -198,6 +203,10 @@ Function GenerateResourcesAndImage {
     $TagsJson = $Tags | ConvertTo-Json -Compress
     if ($PSVersionTable.PSVersion.Major -eq 5) {
         Write-Verbose "PowerShell 5 detected. Replacing double quotes with escaped double quotes in tags JSON."
+        $TagsJson = $TagsJson -replace '"', '\"'
+    }
+    elseif ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -le 2) {
+        Write-Verbose "PowerShell 7.0-7.2 detected. Replacing double quotes with escaped double quotes in tags JSON."
         $TagsJson = $TagsJson -replace '"', '\"'
     }
     Write-Debug "Tags JSON: $TagsJson."
@@ -266,16 +275,23 @@ Function GenerateResourcesAndImage {
                 $ResourceGroupExists = $false
             }
             else {
-                # Resource group already exists, ask the user what to do
-                $title = "Resource group '$ResourceGroupName' already exists"
-                $message = "Do you want to delete the resource group and all resources in it?"
+                # are we running in a non-interactive session?
+                # https://stackoverflow.com/questions/9738535/powershell-test-for-noninteractive-mode
+                if ([System.Console]::IsOutputRedirected -or ![Environment]::UserInteractive -or !!([Environment]::GetCommandLineArgs() | Where-Object { $_ -ilike '-noni*' })) {
+                    throw "Non-interactive mode, resource group '$ResourceGroupName' already exists, either specify -Force to delete it, or -ReuseResourceGroup to reuse."
+                }
+                else {
+                    # Resource group already exists, ask the user what to do
+                    $title = "Resource group '$ResourceGroupName' already exists"
+                    $message = "Do you want to delete the resource group and all resources in it?"
                 
-                $options = @(
-                    [System.Management.Automation.Host.ChoiceDescription]::new("&Yes", "Delete the resource group and all resources in it."),
-                    [System.Management.Automation.Host.ChoiceDescription]::new("&No", "Keep the resource group and continue."),
-                    [System.Management.Automation.Host.ChoiceDescription]::new("&Abort", "Abort execution.")
-                )
-                $result = $Host.UI.PromptForChoice($title, $message, $options, 0)
+                    $options = @(
+                        [System.Management.Automation.Host.ChoiceDescription]::new("&Yes", "Delete the resource group and all resources in it."),
+                        [System.Management.Automation.Host.ChoiceDescription]::new("&No", "Keep the resource group and continue."),
+                        [System.Management.Automation.Host.ChoiceDescription]::new("&Abort", "Abort execution.")
+                    )
+                    $result = $Host.UI.PromptForChoice($title, $message, $options, 0)
+                }
 
                 switch ($result) {
                     0 {
