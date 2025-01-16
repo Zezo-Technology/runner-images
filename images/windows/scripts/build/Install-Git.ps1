@@ -3,15 +3,19 @@
 ##  Desc:  Install Git for Windows
 ##  Supply chain security: Git - checksum validation, Hub CLI - managed by package manager
 ################################################################################
-Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 
 # Install the latest version of Git for Windows
-$repoURL = "https://api.github.com/repos/git-for-windows/git/releases/latest"
-$gitReleases = Invoke-RestMethod $repoURL
-$downloadUrl = $gitReleases.assets.browser_download_url -match "Git-.+-64-bit.exe" | Select-Object -First 1
 
-$installerFile = Split-Path $downloadUrl -Leaf
-$externalHash = Get-HashFromGitHubReleaseBody -Url $RepoURL -FileName $installerFile
+$downloadUrl = Resolve-GithubReleaseAssetUrl `
+    -Repo "git-for-windows/git" `
+    -Version "latest" `
+    -UrlMatchPattern "Git-*-64-bit.exe"
+
+$externalHash = Get-ChecksumFromGithubRelease `
+    -Repo "git-for-windows/git" `
+    -Version "latest" `
+    -FileName (Split-Path $downloadUrl -Leaf) `
+    -HashType "SHA256"
 
 Install-Binary `
     -Url $downloadUrl `
@@ -28,12 +32,15 @@ Install-Binary `
         "/COMPONENTS=gitlfs") `
     -ExpectedSHA256Sum $externalHash
 
-Update-SessionEnvironment
+Update-Environment
 
 git config --system --add safe.directory "*"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to configure safe.directory for Git with exit code $LASTEXITCODE"
+}
 
 # Disable GCM machine-wide
-[Environment]::SetEnvironmentVariable("GCM_INTERACTIVE", "Never", [System.EnvironmentVariableTarget]::Machine)
+[Environment]::SetEnvironmentVariable("GCM_INTERACTIVE", "Never", "Machine")
 
 # Add to PATH
 Add-MachinePathItem "C:\Program Files\Git\bin"

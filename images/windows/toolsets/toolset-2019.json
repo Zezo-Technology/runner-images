@@ -5,13 +5,11 @@
             "arch": "x64",
             "platform" : "win32",
             "versions": [
-                "2.5",
-                "2.6",
-                "2.7",
                 "3.0",
-                "3.1"
+                "3.1",
+                "3.2"
             ],
-            "default": "2.5"
+            "default": "3.0"
         },
         {
             "name": "Python",
@@ -19,14 +17,13 @@
             "arch": "x64",
             "platform" : "win32",
             "versions": [
-                "3.7.*",
                 "3.8.*",
                 "3.9.*",
                 "3.10.*",
                 "3.11.*",
                 "3.12.*"
             ],
-            "default": "3.7.*"
+            "default": "3.9.*"
         },
         {
             "name": "Python",
@@ -34,7 +31,6 @@
             "arch": "x86",
             "platform" : "win32",
             "versions": [
-                "3.7.*",
                 "3.8.*",
                 "3.9.*",
                 "3.10.*",
@@ -63,7 +59,8 @@
             "versions": [
                 "16.*",
                 "18.*",
-                "20.*"
+                "20.*",
+                "22.*"
             ]
         },
         {
@@ -72,11 +69,12 @@
             "arch": "x64",
             "platform" : "win32",
             "versions": [
-                "1.19.*",
                 "1.20.*",
-                "1.21.*"
+                "1.21.*",
+                "1.22.*",
+                "1.23.*"
             ],
-            "default": "1.20.*"
+            "default": "1.21.*"
         }
     ],
     "powershellModules": [
@@ -86,7 +84,7 @@
         {"name": "PowerShellGet"},
         {"name": "PSScriptAnalyzer"},
         {"name": "PSWindowsUpdate"},
-        {"name": "SqlServer"},
+        {"name": "SqlServer", "versions": ["22.2.0"]},
         {"name": "VSSetup"},
         {"name": "Microsoft.Graph"},
         {"name": "AWSPowershell"}
@@ -122,23 +120,9 @@
         {
             "name": "az",
             "versions": [
-                "9.3.0"
+                "12.1.0"
             ],
             "zip_versions": [
-                "1.0.0",
-                "1.6.0",
-                "2.3.2",
-                "2.6.0",
-                "3.1.0",
-                "3.5.0",
-                "3.8.0",
-                "4.3.0",
-                "4.4.0",
-                "4.7.0",
-                "5.5.0",
-                "5.9.0",
-                "6.6.0",
-                "7.5.0"
             ]
         }
     ],
@@ -149,18 +133,14 @@
     "android": {
         "commandline_tools_url": "https://dl.google.com/android/repository/commandlinetools-win-9123335_latest.zip",
         "hash": "8A90E6A3DEB2FA13229B2E335EFD07687DCC8A55A3C544DA9F40B41404993E7D",
-        "platform_min_version": "19",
-        "build_tools_min_version": "19.1.0",
-        "extra_list": [
+        "platform_min_version": "31",
+        "build_tools_min_version": "31.0.0",
+        "extras": [
             "android;m2repository",
             "google;m2repository",
-            "google;google_play_services",
-            "m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2",
-            "m2repository;com;android;support;constraint;constraint-layout-solver;1.0.1",
-            "m2repository;com;android;support;constraint;constraint-layout;1.0.2",
-            "m2repository;com;android;support;constraint;constraint-layout;1.0.1"
+            "google;google_play_services"
         ],
-        "addon_list": [
+        "addons": [
             "addon-google_apis-google-24",
             "addon-google_apis-google-23",
             "addon-google_apis-google-22",
@@ -172,9 +152,9 @@
             "cmake;3.22.1"
         ],
         "ndk": {
-            "default": "25",
+            "default": "27",
             "versions": [
-                "24", "25", "26"
+                "26" , "27"
             ]
         }
     },
@@ -259,14 +239,17 @@
         { "name": "FS-iSCSITarget-Server", "includeAllSubFeatures": true, "includeManagementTools": true },
         { "name": "Containers" },
         { "name": "Microsoft-Windows-Subsystem-Linux", "optionalFeature": true },
-        { "name": "VirtualMachinePlatform", "optionalFeature": true }
+        { "name": "VirtualMachinePlatform", "optionalFeature": true },
+        { "name": "Wireless-Networking" }
     ],
     "visualStudio": {
         "version" : "2019",
         "subversion" : "16",
         "edition" : "Enterprise",
         "channel": "release",
-        "signature": "72105B6D5F370B62FD5C82F1512F7AD7DEE5F2C0",
+        "signature": [
+                      "8F985BE8FD256085C90A95D3C74580511A1DB975" 
+                    ],
         "workloads": [
             "Component.Dotfuscator",
             "Component.Linux.CMake",
@@ -284,7 +267,6 @@
             "Microsoft.VisualStudio.Component.AspNet45",
             "Microsoft.VisualStudio.Component.Azure.Kubernetes.Tools",
             "Microsoft.VisualStudio.Component.Azure.ServiceFabric.Tools",
-            "Microsoft.VisualStudio.Component.Azure.Storage.AzCopy",
             "Microsoft.VisualStudio.Component.Debugger.JustInTime",
             "Microsoft.VisualStudio.Component.DslTools",
             "Microsoft.VisualStudio.Component.EntityFramework",
@@ -383,7 +365,11 @@
             "mcr.microsoft.com/dotnet/framework/aspnet:4.8-windowsservercore-ltsc2019",
             "mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2019",
             "mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2019"
-        ]
+        ],
+        "components": {
+            "docker": "26.1.3",
+            "compose": "2.27.1"
+        }
     },
     "pipx": [
         {
@@ -392,8 +378,7 @@
         }
     ],
     "selenium": {
-        "version": "4",
-        "binary_name": "selenium-server"
+        "version": "4"
     },
     "npm": {
         "global_packages": [
@@ -413,17 +398,18 @@
     "serviceFabric": {
         "runtime": {
             "version": "9.1.1436.9590",
-            "signature": "AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173"
+            "checksum": "089F9BE6A63AF66C337E507B52082575C8ED330DF765259C6F2F13F900DA96D5"
         },
         "sdk": {
             "version": "6.1.1436",
-            "signature": "AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173"
+            "checksum": "D2A6B58315D08B6E46C2D25E91DFA1163136F70A5FA8CEF9DB147F07EE001AD1"
         }
     },
     "dotnet": {
         "versions": [
             "6.0",
-            "7.0"
+            "8.0",
+            "9.0"
         ],
         "tools": [
             { "name": "nbgv", "test": "nbgv --version", "getversion": "nbgv --version" }
@@ -436,7 +422,7 @@
             { "name": "aria2" },
             { "name": "azcopy10" },
             { "name": "Bicep" },
-            { "name": "gitversion.portable" },
+            { "name": "gitversion.portable"},
             { "name": "innosetup" },
             { "name": "jq" },
             { "name": "NuGet.CommandLine" },
@@ -446,7 +432,6 @@
                 "args": [ "--version", "5.32.1.1" ]
             },
             { "name": "pulumi" },
-            { "name": "tortoisesvn" },
             { "name": "swig" },
             { "name": "vswhere" },
             {
@@ -461,10 +446,10 @@
         ]
     },
     "node": {
-        "default": "18"
+        "default": "18.*"
     },
     "maven": {
-        "version": "3.8"
+        "version": "3.9"
     },
     "mysql": {
         "version": "5.7",
@@ -475,23 +460,25 @@
         "signature": "F2D7C28591847BB2CB2B1C2A0C59459FDC728A38"
     },
     "nsis": {
-        "version": "3.08"
+        "version": "3.10"
     },
     "php": {
-        "version": "8.2"
+        "version": "8.3"
     },
     "llvm": {
-        "version": "16"
+        "version": "18"
     },
     "postgresql": {
-        "version": "14",
+        "version": "14.12.1",
         "signature": "698BA51AA27CC31282AACA5055E4B9190BC6C0E9"
     },
     "kotlin": {
-        "version": "latest",
-        "binary_name": "kotlin-compiler"
+        "version": "latest"
     },
     "openssl": {
         "version": "1.1.1"
+    },
+    "pwsh": {
+        "version": "7.4"
     }
 }
