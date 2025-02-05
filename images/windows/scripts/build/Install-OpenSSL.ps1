@@ -9,7 +9,7 @@ $bits = '64'
 $light = $false
 $installerType = "exe"
 $version = (Get-ToolsetContent).openssl.version
-$installDir = "$Env:ProgramFiles\OpenSSL"
+$installDir = "$env:ProgramFiles\OpenSSL"
 
 # Fetch available installers list
 $jsonUrl = 'https://raw.githubusercontent.com/slproweb/opensslhashes/master/win32_openssl_hashes.json'
@@ -39,6 +39,6 @@ Install-Binary `
 
 # Update PATH
 Add-MachinePathItem "$installDir\bin"
-$env:Path = Get-MachinePath
+Update-Environment
 
 Invoke-PesterTests -TestFile "Tools" -TestName "OpenSSL"
